@@ -84,7 +84,9 @@
       const candidate = normalize(input.value);
 
       // Accept "awol-0618" and also "awol0618" (no dash)
-      if (candidate === "awol-0618" || candidate === "awol0618") {
+      console.log("RAW INPUT:", input.value);
+console.log("NORMALIZED:", candidate);
+if (candidate === "awol-0618" || candidate === "awol0618") {
         err.style.color = "var(--accent)";
         err.textContent = "[ ok ] access granted";
         setTimeout(()=>{ window.location.href = SUCCESS_REDIRECT; }, 400);
@@ -98,3 +100,4 @@
   </script>
 </body>
 </html>
+
