@@ -51,16 +51,14 @@
 
     <div class="footer">
       <div>AWØL // Another Way Øf Living</div>
-      <div>fragment_03.gate v1.2</div>
+      <div>fragment_03.gate v1.3</div>
     </div>
   </div>
 
   <script>
-    // ===== CONFIG =====
-    // TODO: replace with your private Notion link:
     const SUCCESS_REDIRECT = "https://www.notion.so/your-hidden-page-slug";
 
-    // SHA-256 of "awol-0618" AFTER normalization.
+    // SHA-256 of normalized "awol-0618"
     const validHashes = new Set([
       "ecf4b7b3b27b529b8d3e65c2b0f3f9390f139abf470fcb3c20ad967eb412731b"
     ]);
@@ -75,17 +73,12 @@
       return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
     }
 
-    // Robust normalization:
-    // - Normalize Unicode (NFKC) to kill weird forms
-    // - Lowercase for case-insensitive compare
-    // - Convert ALL dash variants (‐ - ‒ – — ― and minus) to hyphen-minus "-"
-    // - Strip any non a-z / 0-9 / "-" (removes zero-width & fancy spaces)
     function normalize(s){
       return (s || "")
         .normalize("NFKC")
         .toLowerCase()
-        .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g, "-")
-        .replace(/[^a-z0-9-]/g, "")
+        .replace(/[\u2010-\u2015\u2212]/g, "-") // all dash/minus types → hyphen-minus
+        .replace(/[^a-z0-9-]/g, "")            // strip weird spaces/zero-width
         .trim();
     }
 
