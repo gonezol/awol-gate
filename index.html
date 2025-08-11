@@ -51,46 +51,43 @@
 
     <div class="footer">
       <div>AWØL // Another Way Øf Living</div>
-      <div>fragment_03.gate v1.3</div>
+      <div>fragment_03.gate v1.4</div>
     </div>
   </div>
 
   <script>
+    // ===== CONFIG =====
+    // Replace with your private Notion link:
     const SUCCESS_REDIRECT = "https://www.notion.so/your-hidden-page-slug";
-
-    // SHA-256 of normalized "awol-0618"
-    const validHashes = new Set([
-      "ecf4b7b3b27b529b8d3e65c2b0f3f9390f139abf470fcb3c20ad967eb412731b"
-    ]);
 
     const form = document.getElementById("gate");
     const input = document.getElementById("pw");
     const err = document.getElementById("err");
 
-    async function sha256(text){
-      const enc = new TextEncoder().encode(text);
-      const buf = await crypto.subtle.digest("SHA-256", enc);
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
-    }
-
+    // Extremely forgiving normalizer:
+    // - Unicode normalize
+    // - Lowercase
+    // - Convert all dash/minus variants to "-"
+    // - Strip everything except a-z, 0-9 and "-"
     function normalize(s){
       return (s || "")
         .normalize("NFKC")
         .toLowerCase()
-        .replace(/[\u2010-\u2015\u2212]/g, "-") // all dash/minus types → hyphen-minus
-        .replace(/[^a-z0-9-]/g, "")            // strip weird spaces/zero-width
+        .replace(/[\u2010-\u2015\u2212]/g, "-") // ‐ - ‒ – — ― and minus → "-"
+        .replace(/[^a-z0-9-]/g, "")            // strip odd/invisible characters
         .trim();
     }
 
-    form.addEventListener("submit", async (e)=>{
+    form.addEventListener("submit", (e)=>{
       e.preventDefault();
       err.textContent = "";
       const candidate = normalize(input.value);
-      const hash = await sha256(candidate);
-      if (validHashes.has(hash)){
+
+      // Accept "awol-0618" and also "awol0618" (no dash)
+      if (candidate === "awol-0618" || candidate === "awol0618") {
         err.style.color = "var(--accent)";
         err.textContent = "[ ok ] access granted";
-        setTimeout(()=>{ window.location.href = SUCCESS_REDIRECT; }, 500);
+        setTimeout(()=>{ window.location.href = SUCCESS_REDIRECT; }, 400);
       } else {
         const frame = document.querySelector(".frame");
         frame.classList.remove("shake"); void frame.offsetWidth; frame.classList.add("shake");
