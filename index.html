@@ -61,8 +61,8 @@
 
     // Accept AWØL-0618 (Ø) and AW0L-0618 (zero). Stored as SHA-256 hashes.
     const validHashes = new Set([
-      "d96420f48841c631c1f31c28076108545dbd152ac62c7df50c2437e566eb9a5c", // AWØL-0618
-      "8e5e8b2fb5aea4602b0b8230ab10d27aca58adb2cead3e8be6330cc575aaa4ba"  // AW0L-0618
+      "d96420f48841c631c1f31c28076108545dbd152ac62c7df50c2437e566eb9a5c", // awøl-0618
+      "8e5e8b2fb5aea4602b0b8230ab10d27aca58adb2cead3e8be6330cc575aaa4ba"  // aw0l-0618
     ]);
 
     const form = document.getElementById("gate");
@@ -75,7 +75,10 @@
       return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
     }
     function normalize(s){
-      return s.replace(/\u2013|\u2014/g,"-").replace(/\s+/g,"").trim();
+      return s.toLowerCase()
+              .replace(/\u2013|\u2014/g,"-")
+              .replace(/\s+/g,"")
+              .trim();
     }
 
     form.addEventListener("submit", async (e)=>{
