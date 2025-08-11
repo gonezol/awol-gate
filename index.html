@@ -59,10 +59,9 @@
     // TODO: replace with your private Notion link:
     const SUCCESS_REDIRECT = "https://www.notion.so/your-hidden-page-slug";
 
-    // Accept AWØL-0618 (Ø) and AW0L-0618 (zero). Stored as SHA-256 hashes.
+    // Accept awol-0618 (any capitalization). Stored as lowercase SHA-256 hash.
     const validHashes = new Set([
-      "d96420f48841c631c1f31c28076108545dbd152ac62c7df50c2437e566eb9a5c", // awøl-0618
-      "8e5e8b2fb5aea4602b0b8230ab10d27aca58adb2cead3e8be6330cc575aaa4ba"  // aw0l-0618
+      "ecf4b7b3b27b529b8d3e65c2b0f3f9390f139abf470fcb3c20ad967eb412731b" // awol-0618
     ]);
 
     const form = document.getElementById("gate");
