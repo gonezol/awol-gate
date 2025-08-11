@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AWØL Gate</title>
+  <style>
+    :root { --bg:#0a0a0a; --fg:#f5f5f5; --muted:#8a8a8a; --accent:#8cff9c; --error:#ff5370; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:#0a0a0a;color:var(--fg);font:16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:grid;place-items:center;padding:24px}
+    .frame{width:min(680px,100%);border:1px solid #191919;border-radius:14px;background:#0b0b0b;box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 0 1px #0f0f0f;overflow:hidden}
+    .hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #141414;background:linear-gradient(#0d0d0d,#0b0b0b)}
+    .dot{width:10px;height:10px;border-radius:50%}.red{background:#ff5f57}.yellow{background:#febc2e}.green{background:#28c840}
+    .title{margin-left:6px;color:var(--muted);font-size:13px;letter-spacing:.3px}
+    .term{padding:22px 18px 20px;line-height:1.6}
+    .muted{color:var(--muted)} .scan{color:var(--accent)}
+    .cursor{display:inline-block;width:8px;height:1.2em;background:var(--fg);margin-left:6px;animation:blink 1s infinite;vertical-align:-2px}
+    @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+    .inputRow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+    input[type="password"]{flex:1 1 260px;background:#0f0f0f;color:var(--fg);border:1px solid #1a1a1a;border-radius:10px;padding:12px 14px;outline:none;letter-spacing:.5px}
+    input[type="password"]:focus{border-color:#2a2a2a}
+    button{background:#111;color:var(--fg);border:1px solid #1a1a1a;border-radius:10px;padding:12px 16px;cursor:pointer}
+    button:hover{border-color:#2a2a2a;background:#121212}
+    .err{color:var(--error);margin-top:10px;min-height:1.2em}
+    .footer{border-top:1px solid #111;padding:12px 14px;font-size:12px;color:#6e6e6e;display:flex;justify-content:space-between}
+    .shake{animation:shake .24s linear}@keyframes shake{0%{transform:translateX(0)}25%{-webkit-transform:translateX(-4px);transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-3px)}100%{transform:translateX(0)}}
+  </style>
+</head>
+<body>
+  <div class="frame" role="application" aria-label="AWØL password gate">
+    <div class="hdr">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">/dev/ø/fragment_03 — ACCESS</div>
+    </div>
+
+    <div class="term">
+      <div class="muted">[FRAGMENT_03]</div>
+      <div>[∅] channel = ø</div>
+      <div>[∅] gate = armed</div>
+      <div class="scan">[∅] enter key to proceed<span class="cursor" aria-hidden="true"></span></div>
+
+      <form class="inputRow" id="gate">
+        <input id="pw" type="password" inputmode="text" autocomplete="off" autocapitalize="none" placeholder="enter password" aria-label="Password" />
+        <button type="submit" aria-label="Submit password">unlock</button>
+      </form>
+
+      <div id="err" class="err" role="alert" aria-live="polite"></div>
+      <div class="muted" style="font-size:13px;margin-top:8px">hint: you saw it hidden in the still frame.</div>
+    </div>
+
+    <div class="footer">
+      <div>AWØL // Another Way Øf Living</div>
+      <div>fragment_03.gate v1.0</div>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIG =====
+    // TODO: replace with your private Notion link:
+    const SUCCESS_REDIRECT = "https://www.notion.so/your-hidden-page-slug";
+
+    // Accept AWØL-0618 (Ø) and AW0L-0618 (zero). Stored as SHA-256 hashes.
+    const validHashes = new Set([
+      "d96420f48841c631c1f31c28076108545dbd152ac62c7df50c2437e566eb9a5c", // AWØL-0618
+      "8e5e8b2fb5aea4602b0b8230ab10d27aca58adb2cead3e8be6330cc575aaa4ba"  // AW0L-0618
+    ]);
+
+    const form = document.getElementById("gate");
+    const input = document.getElementById("pw");
+    const err = document.getElementById("err");
+
+    async function sha256(text){
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+    function normalize(s){
+      return s.replace(/\u2013|\u2014/g,"-").replace(/\s+/g,"").trim();
+    }
+
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      err.textContent = "";
+      const candidate = normalize(input.value || "");
+      const hash = await sha256(candidate);
+      if (validHashes.has(hash)){
+        err.style.color = "var(--accent)";
+        err.textContent = "[ ok ] access granted";
+        setTimeout(()=>{ window.location.href = SUCCESS_REDIRECT; }, 500);
+      } else {
+        document.querySelector(".frame").classList.remove("shake"); void document.querySelector(".frame").offsetWidth;
+        document.querySelector(".frame").classList.add("shake");
+        err.textContent = "[ x ] invalid key";
+        input.focus(); input.select();
+      }
+    });
+  </script>
+</body>
+</html>
